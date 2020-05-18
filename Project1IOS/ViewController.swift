@@ -54,15 +54,15 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
     }
     
-    
+    //init the board (when click "start" button)
     @IBAction func initGameBoard(_ sender: Any) {
         resetBoard(gameBoard: makeGameboard())
         shuffleCards(gameBoard: makeGameboard())
         game_BTN_start.isEnabled = false
         game_BTN_color.backgroundColor = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
-        //print(imageBoardByPlaces)
     }
     
+    //new game
     func resetBoard(gameBoard: [[UIButton]]){
         time = 0
         moves = MOVES_CONST
@@ -72,7 +72,7 @@ class ViewController: UIViewController {
         game_LBL_moves.text = String(moves)
         timer.invalidate()
         timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(self.updateTimer), userInfo: nil, repeats: true)
-        for line in gameBoard{
+        for line in gameBoard{ //set the hide card image
             for card in line{
                 card.isEnabled = true
                 card.setImage(#imageLiteral(resourceName: "logo"), for: .normal)
@@ -80,24 +80,26 @@ class ViewController: UIViewController {
         }
     }
     
+    //when any button is click
     @IBAction func btnClicked (_ sender: UIButton){
         if (fliped.count == 1 || fliped.count == 0 ){
+            //get the flipping index
             flipedIndex.0 = (sender.tag)/10
             flipedIndex.1 = (sender.tag)%10
             UIView.transition(with: sender, duration: 0.5, options: .transitionFlipFromRight,
                               animations: nil, completion: nil)
-            flipCard(gameBoard: makeGameboard(), flipedIndex: flipedIndex)
+            flipCard(gameBoard: makeGameboard(), flipedIndex: flipedIndex) //flip the actual card
         }
     }
     
     func flipCard(gameBoard: [[UIButton]], flipedIndex: (Int,Int)) {
         let indexOfImage = imageBoardByPlaces[flipedIndex.0][flipedIndex.1]
-        gameBoard[flipedIndex.0][flipedIndex.1].setImage(images[indexOfImage], for: .normal)
-        fliped.append(gameBoard[flipedIndex.0][flipedIndex.1])
+        gameBoard[flipedIndex.0][flipedIndex.1].setImage(images[indexOfImage], for: .normal) //set the image
+        fliped.append(gameBoard[flipedIndex.0][flipedIndex.1]) //add to flipped cards
         counterClicks += 1
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.5, execute: {
-            self.checkIfCardsMatch()
+            self.checkIfCardsMatch() //check if both cards matches
         })
         
     }
@@ -123,7 +125,7 @@ class ViewController: UIViewController {
                 game_BTN_color.backgroundColor = #colorLiteral(red: 0, green: 1, blue: 0.07825255885, alpha: 1)
                 makeAllBtnsDisabled()
             }else {
-                if fliped[0].currentImage == fliped[1].currentImage{
+                if fliped[0].currentImage == fliped[1].currentImage { //check images behind the cards
                     matches += 1
                     fliped[0].isEnabled = false
                     fliped[1].isEnabled = false
@@ -143,6 +145,7 @@ class ViewController: UIViewController {
                     UIView.transition(with: fliped[0], duration: 0.5, options: .transitionFlipFromLeft,
                                       animations: nil, completion: nil)
                     UIView.transition(with: fliped[1], duration: 0.5, options: .transitionFlipFromLeft, animations: nil, completion: nil)
+                    //return to hide image
                     fliped[0].setImage(#imageLiteral(resourceName: "logo"), for: .normal)
                     fliped[1].setImage(#imageLiteral(resourceName: "logo"), for: .normal)
                     fliped.removeAll()
@@ -165,6 +168,7 @@ class ViewController: UIViewController {
         game_LBL_timer.text = "Time: " + String(time)
     }
     
+    //shuffle all cards when clicking start button
     func shuffleCards(gameBoard: [[UIButton]]){
         var set: Set = Set<String>()
         repeat{ //shuffle the numbers
@@ -193,6 +197,7 @@ class ViewController: UIViewController {
         
     }
     
+    //check if the user has all matches
     func checkIfUserWin() -> Bool{
         if matches == 8{
             return true
